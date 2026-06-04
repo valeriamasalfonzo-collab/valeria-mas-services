@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI-Powered Portfolio & Resume Services | Premium, Warm, Confident</title>
+
+  <!-- Premium system + fallback -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- “Type B premium” alternative to SF Pro (system font still preferred when available) -->
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      /* OPTION B: Papel del Bosque */
+      --bg0:#101d18;
+      --bg1:#244b3a;
+      --bg2:#5f8c6d;
+      --paper:#f7f4ea;
+      --mist:#dfe8d9;
+
+      --ink:#0d1512;
+      --text:#eaf2ea;
+      --muted:rgba(234,242,234,.78);
+
+      --accent:#7fe2b5;         /* modern mint for CTAs */
+      --accent2:#d9b37d;        /* premium gold-ish for highlights */
+      --danger:#ff2f2f;
+
+      --card: rgba(16,29,24,.62);
+      --card2: rgba(36,75,58,.52);
+      --stroke: rgba(223,232,217,.18);
+      --stroke2: rgba(127,226,181,.18);
+
+      --shadow: 0 18px 70px rgba(0,0,0,.45);
+      --shadow2: 0 18px 60px rgba(0,0,0,.32);
+      --radius: 18px;
+      --radius2: 24px;
+      --max: 1120px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, "SF Pro Display","SF Pro Text","San Francisco","Segoe UI", Roboto, Helvetica, Arial, "Manrope", sans-serif;
+
+      --ease: cubic-bezier(.2,.8,.2,1);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: var(--font);
+      color: var(--text);
+      background: radial-gradient(1200px 700px at 18% 15%, rgba(95,140,109,.22), transparent 60%),
+                  radial-gradient(900px 600px at 78% 20%, rgba(127,226,181,.18), transparent 55%),
+                  radial-gradient(900px 700px at 60% 88%, rgba(217,179,125,.10), transparent 60%),
+                  linear-gradient(180deg, var(--bg0), #0d1612 55%, #0a120f);
+      overflow-x:hidden;
+    }
+
+    /* 3D movable panel background */
+    .bg{
+      position: fixed;
+      inset: 0;
+      z-index: -3;
+      overflow:hidden;
+      pointer-events:none;
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      background:
+        radial-gradient(1200px 700px at 25% 10%, rgba(95,140,109,.18), transparent 60%),
+        radial-gradient(900px 700px at 70% 30%, rgba(36,75,58,.25), transparent 60%),
+        radial-gradient(900px 700px at 70% 85%, rgba(127,226,181,.08), transparent 60%);
+      filter: saturate(1.1);
+    }
+
+    .panel{
+      position:absolute;
+      width: 58vmin;
+      height: 58vmin;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(223,232,217,.12), rgba(223,232,217,.02)),
+        radial-gradient(600px 400px at 20% 20%, rgba(127,226,181,.18), transparent 55%),
+        radial-gradient(600px 400px at 85% 75%, rgba(217,179,125,.12), transparent 60%);
+      border: 1px solid rgba(223,232,217,.14);
+      box-shadow: 0 25px 90px rgba(0,0,0,.38);
+      backdrop-filter: blur(10px);
+      transform-style: preserve-3d;
+      opacity: .95;
+    }
+
+    .panel::after{
+      content:"";
+      position:absolute;
+      inset: 10%;
+      border-radius: 22px;
+      border: 1px dashed rgba(127,226,181,.18);
+      transform: translateZ(22px);
+      opacity:.75;
+    }
+
+    .grain{
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      pointer-events:none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="220" height="220" filter="url(%23n)" opacity="0.25"/></svg>');
+      opacity:.14;
+      mix-blend-mode: overlay;
+    }
+
+    .vignette{
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events:none;
+      background: radial-gradient(1200px 700px at 50% 22%, transparent 55%, rgba(0,0,0,.45) 100%);
+    }
+
+    a{color:inherit}
+    .container{
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    /* Topbar */
+    .topbar{
+      position: sticky;
+      top:0;
+      z-index: 50;
+      padding: 14px 0;
+      background: linear-gradient(180deg, rgba(16,29,24,.82), rgba(16,29,24,.45));
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(223,232,217,.12);
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      text-decoration:none;
+    }
+
+    .logo{
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background:
+        radial-gradient(18px 18px at 30% 30%, rgba(127,226,181,.85), rgba(127,226,181,.12)),
+        linear-gradient(145deg, rgba(223,232,217,.18), rgba(36,75,58,.55));
+      border: 1px solid rgba(223,232,217,.22);
+      box-shadow: 0 10px 30px rgba(0,0,0,.28);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .logo::before{
+      content:"";
+      position:absolute; inset:-60%;
+      background: conic-gradient(from 180deg, transparent, rgba(127,226,181,.65), transparent, rgba(217,179,125,.35), transparent);
+      animation: spin 8s linear infinite;
+      opacity:.7;
+    }
+    @keyframes spin{to{transform: rotate(360deg)}}
+
+    .brand strong{
+      font-weight: 800;
+      letter-spacing: .2px;
+      line-height: 1.1;
+    }
+    .brand span{
+      display:block;
+      font-size: 12.5px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: .2px;
+      margin-top:2px;
+    }
+
+    .navlinks{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+    }
+
+    .navlinks a{
+      text-decoration:none;
+      font-weight: 650;
+      font-size: 13.5px;
+      color: rgba(234,242,234,.86);
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: transform .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease);
+      white-space:nowrap;
+    }
+
+    .navlinks a:hover{
+      background: rgba(223,232,217,.06);
+      border-color: rgba(223,232,217,.12);
+      transform: translateY(-1px);
+    }
+    .navlinks a.active{
+      background: rgba(127,226,181,.12);
+      border-color: rgba(127,226,181,.20);
+      color: rgba(255,255,255,.95);
+    }
+
+    .navRight{
+      display:flex; align-items:center; gap:10px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(223,232,217,.16);
+      background: rgba(16,29,24,.35);
+      color: rgba(234,242,234,.88);
+      font-size: 12.5px;
+      font-weight: 650;
+      user-select:none;
+    }
+
+    .chip i{opacity:.9}
+
+    .btn{
+      appearance:none;
+      border: 1px solid rgba(223,232,217,.16);
+      background: rgba(223,232,217,.06);
+      color: rgba(255,255,255,.92);
+      border-radius: 14px;
+      padding: 11px 14px;
+      font-weight: 750;
+      font-size: 13.5px;
+      cursor:pointer;
+      transition: transform .2s var(--ease), background .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease);
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      text-decoration:none;
+      line-height: 1;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(223,232,217,.09); border-color: rgba(223,232,217,.22)}
+    .btn:active{transform: translateY(0px) scale(.99)}
+
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(127,226,181,.22), rgba(127,226,181,.10));
+      border-color: rgba(127,226,181,.26);
+      box-shadow: 0 14px 40px rgba(127,226,181,.10);
+    }
+    .btnPrimary:hover{
+      background: linear-gradient(135deg, rgba(127,226,181,.28), rgba(127,226,181,.12));
+      border-color: rgba(127,226,181,.36);
+      box-shadow: 0 18px 55px rgba(127,226,181,.14);
+    }
+
+    .iconBtn{
+      width: 42px; height: 42px;
+      border-radius: 14px;
+      display:grid; place-items:center;
+      padding:0;
+    }
+
+    .menuBtn{display:none}
+
+    /* Hero */
+    header.hero{
+      padding: 58px 0 28px;
+    }
+
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .heroCard{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(16,29,24,.62), rgba(16,29,24,.45));
+      border: 1px solid rgba(223,232,217,.14);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+    }
+    .heroCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(700px 300px at 18% 15%, rgba(127,226,181,.18), transparent 50%),
+        radial-gradient(600px 350px at 82% 30%, rgba(217,179,125,.12), transparent 55%),
+        radial-gradient(700px 400px at 62% 95%, rgba(95,140,109,.10), transparent 55%);
+      pointer-events:none;
+      opacity:.95;
+    }
+
+    .heroInner{
+      position:relative;
+      padding: 28px 28px 26px;
+    }
+
+    .eyebrow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      color: rgba(234,242,234,.86);
+      font-weight: 700;
+      font-size: 12.5px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+    .eyebrow .dot{
+      width: 9px; height: 9px; border-radius: 999px;
+      background: rgba(127,226,181,.95);
+      box-shadow: 0 0 0 6px rgba(127,226,181,.12);
+    }
+
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(32px, 4.2vw, 54px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .lead{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 16.5px;
+      line-height: 1.55;
+      max-width: 60ch;
+    }
+
+    .heroActions{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      align-items:center;
+      margin-top: 10px;
+    }
+
+    .mini{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 18px;
+    }
+    .mini .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 9px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(223,232,217,.06);
+      border: 1px solid rgba(223,232,217,.14);
+      color: rgba(234,242,234,.86);
+      font-weight: 650;
+      font-size: 13px;
+    }
+    .pill i{color: rgba(127,226,181,.95)}
+
+    /* Right hero: interactive card */
+    .side{
+      display:grid;
+      grid-template-rows: auto 1fr;
+      gap: 14px;
+    }
+
+    .statsCard{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(36,75,58,.45), rgba(16,29,24,.50));
+      border: 1px solid rgba(223,232,217,.14);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+    }
+    .statsCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(520px 240px at 25% 10%, rgba(127,226,181,.16), transparent 55%),
+        radial-gradient(520px 240px at 90% 30%, rgba(217,179,125,.10), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .statsInner{position:relative; padding: 18px 18px 16px}
+    .statsTop{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      align-items:flex-start;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 750;
+      font-size: 12px;
+      background: rgba(127,226,181,.12);
+      border: 1px solid rgba(127,226,181,.22);
+      color: rgba(255,255,255,.92);
+    }
+
+    .mutedSmall{color: rgba(234,242,234,.74); font-size: 13px; line-height:1.45; margin-top: 10px}
+
+    .statGrid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .stat{
+      border-radius: 16px;
+      background: rgba(16,29,24,.45);
+      border: 1px solid rgba(223,232,217,.12);
+      padding: 12px 12px;
+      min-height: 74px;
+    }
+    .stat b{display:block; font-size: 16px; letter-spacing:-0.01em}
+    .stat span{display:block; color: rgba(234,242,234,.72); font-size: 12.5px; margin-top: 4px}
+
+    .audioCard{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(16,29,24,.62), rgba(16,29,24,.44));
+      border: 1px solid rgba(223,232,217,.14);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+    }
+    .audioCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(700px 320px at 20% 20%, rgba(127,226,181,.12), transparent 60%),
+        radial-gradient(650px 320px at 85% 75%, rgba(217,179,125,.10), transparent 62%);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .audioInner{position:relative; padding: 18px}
+    .audioRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .audioTitle{
+      display:flex; flex-direction:column;
+      gap: 4px;
+    }
+    .audioTitle strong{font-weight: 850; letter-spacing:-0.01em}
+    .audioTitle small{color: rgba(234,242,234,.72); font-weight:650}
+
+    .visualizer{
+      margin-top: 12px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(223,232,217,.05);
+      border: 1px solid rgba(223,232,217,.12);
+      display:flex;
+      align-items:flex-end;
+      gap: 5px;
+      padding: 10px 10px;
+      overflow:hidden;
+    }
+    .bar{
+      width: 6px;
+      flex: 1;
+      max-width: 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(127,226,181,.95), rgba(127,226,181,.18));
+      height: 10px;
+      transform-origin: bottom;
+      opacity: .95;
+      filter: drop-shadow(0 10px 18px rgba(127,226,181,.18));
+    }
+
+    /* Sections */
+    section{
+      padding: 22px 0;
+    }
+    .sectionHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 14px;
+      margin: 18px 0 14px;
+    }
+    h2{
+      margin:0;
+      font-size: clamp(22px, 2.5vw, 30px);
+      letter-spacing: -0.02em;
+    }
+    .sub{
+      margin:0;
+      color: var(--muted);
+      max-width: 70ch;
+      line-height: 1.5;
+      font-size: 14.5px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .card{
+      grid-column: span 3;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(16,29,24,.62), rgba(16,29,24,.45));
+      border: 1px solid rgba(223,232,217,.14);
+      box-shadow: 0 16px 50px rgba(0,0,0,.25);
+      padding: 16px;
+      position:relative;
+      overflow:hidden;
+      transition: transform .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(127,226,181,.22);
+      background: linear-gradient(180deg, rgba(36,75,58,.52), rgba(16,29,24,.44));
+    }
+    .card .ic{
+      width: 44px; height: 44px; border-radius: 14px;
+      display:grid; place-items:center;
+      background: rgba(127,226,181,.12);
+      border: 1px solid rgba(127,226,181,.22);
+      color: rgba(255,255,255,.92);
+      margin-bottom: 10px;
+    }
+    .card h3{
+      margin: 0 0 6px;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+    .card p{
+      margin: 0;
+      color: rgba(234,242,234,.76);
+      font-size: 13.6px;
+      line-height: 1.5;
+    }
+
+    /* Services */
+    .serviceCard{
+      grid-column: span 4;
+      padding: 18px;
+    }
+    .serviceCard .top{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+      margin-bottom: 10px;
+    }
+    .tag{
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing:.08em;
+      text-transform: uppercase;
+      color: rgba(234,242,234,.78);
+      border: 1px solid rgba(223,232,217,.14);
+      background: rgba(223,232,217,.05);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    .serviceCard ul{
+      margin: 10px 0 0;
+      padding: 0 0 0 18px;
+      color: rgba(234,242,234,.78);
+      line-height: 1.5;
+      font-size: 13.4px;
+    }
+    .serviceCard li{margin: 6px 0}
+    .serviceCard .actions{
+      margin-top: 14px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+
+    /* How it works */
+    .steps .step{
+      grid-column: span 4;
+      padding: 18px;
+    }
+    .stepNum{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .stepNum .num{
+      width: 34px; height: 34px; border-radius: 12px;
+      display:grid; place-items:center;
+      background: rgba(217,179,125,.10);
+      border: 1px solid rgba(217,179,125,.20);
+      color: rgba(255,255,255,.92);
+    }
+
+    /* Showcase */
+    .showcase{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .showcaseCard{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(16,29,24,.62), rgba(16,29,24,.45));
+      border: 1px solid rgba(223,232,217,.14);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+    }
+    .showcaseCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(800px 300px at 12% 20%, rgba(127,226,181,.16), transparent 58%),
+        radial-gradient(650px 360px at 88% 78%, rgba(217,179,125,.10), transparent 60%);
+      opacity:.95;
+      pointer-events:none;
+    }
+
+    .showcaseInner{position:relative; padding: 22px}
+    .proof{
+      display:flex; gap:12px; flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .proof .kpi{
+      flex: 1 1 180px;
+      border-radius: 16px;
+      background: rgba(223,232,217,.05);
+      border: 1px solid rgba(223,232,217,.12);
+      padding: 12px;
+      min-height: 74px;
+    }
+    .kpi b{display:block; font-size: 15.5px}
+    .kpi span{display:block; margin-top:4px; color: rgba(234,242,234,.74); font-size: 12.8px; line-height: 1.35}
+
+    .showcaseAction{
+      display:flex; flex-direction:column; gap: 10px;
+      justify-content:space-between;
+    }
+
+    .ctaPanel{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(36,75,58,.52), rgba(16,29,24,.50));
+      border: 1px solid rgba(127,226,181,.20);
+      box-shadow: 0 18px 60px rgba(127,226,181,.08);
+      padding: 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .ctaPanel::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(520px 220px at 20% 10%, rgba(127,226,181,.18), transparent 60%),
+        radial-gradient(520px 260px at 90% 85%, rgba(217,179,125,.10), transparent 62%);
+      pointer-events:none;
+      opacity:.95;
+    }
+    .ctaPanel .inner{position:relative}
+    .ctaPanel h3{margin: 0 0 6px; font-size: 16px; letter-spacing:-0.01em}
+    .ctaPanel p{margin:0; color: rgba(234,242,234,.76); font-size: 13.6px; line-height:1.5}
+    .ctaPanel .actions{margin-top: 12px; display:flex; gap: 10px; flex-wrap:wrap}
+
+    /* Story */
+    .storyWrap{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(16,29,24,.62), rgba(16,29,24,.44));
+      border: 1px solid rgba(223,232,217,.14);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+      position:relative;
+    }
+    .storyWrap::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(900px 350px at 20% 10%, rgba(127,226,181,.14), transparent 62%),
+        radial-gradient(800px 420px at 82% 80%, rgba(217,179,125,.10), transparent 60%);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .storyInner{
+      position:relative;
+      padding: 22px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items:start;
+    }
+    .quote{
+      border-radius: 18px;
+      background: rgba(223,232,217,.05);
+      border: 1px solid rgba(223,232,217,.12);
+      padding: 16px;
+    }
+    .quote strong{display:block; font-size: 14px; letter-spacing:-0.01em; margin-bottom: 8px}
+    .quote p{margin:0; color: rgba(234,242,234,.78); line-height:1.6; font-size: 13.8px}
+    .story{
+      color: rgba(234,242,234,.80);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    .story p{margin:0 0 12px}
+    .story p:last-child{margin-bottom:0}
+    .hi{
+      color: rgba(255,255,255,.92);
+      font-weight: 800;
+    }
+
+    /* Contact */
+    .contact{
+      padding-bottom: 60px;
+    }
+    .contactCard{
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(36,75,58,.50), rgba(16,29,24,.48));
+      border: 1px solid rgba(127,226,181,.22);
+      box-shadow: 0 20px 70px rgba(0,0,0,.38);
+      overflow:hidden;
+      position:relative;
+    }
+    .contactCard::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(900px 320px at 20% 10%, rgba(127,226,181,.18), transparent 60%),
+        radial-gradient(700px 380px at 80% 85%, rgba(217,179,125,.10), transparent 62%);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .contactInner{
+      position:relative;
+      padding: 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 16px;
+      flex-wrap:wrap;
+    }
+    .contactInner h2{margin:0 0 6px}
+    .contactInner p{margin:0; color: rgba(234,242,234,.78); line-height:1.55; max-width: 70ch}
+
+    /* Mobile */
+    @media (max-width: 940px){
+      .heroGrid{grid-template-columns: 1fr; gap: 14px}
+      .showcase{grid-template-columns: 1fr}
+      .storyInner{grid-template-columns: 1fr}
+      .card{grid-column: span 6}
+      .serviceCard{grid-column: span 12}
+      .steps .step{grid-column: span 12}
+      .statGrid{grid-template-columns: 1fr}
+      .navlinks{display:none}
+      .menuBtn{display:inline-flex}
+    }
+
+    @media (max-width: 560px){
+      header.hero{padding-top: 44px}
+      .heroInner{padding: 22px}
+      .statsInner, .audioInner{padding: 16px}
+      .contactInner{padding: 18px}
+      .chip{display:none}
+      .card{grid-column: span 12}
+    }
+
+    /* Mobile drawer */
+    .drawerOverlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      z-index: 80;
+      display:none;
+    }
+    .drawer{
+      position:fixed;
+      right: 12px;
+      top: 12px;
+      left: 12px;
+      border-radius: 22px;
+      background: rgba(16,29,24,.92);
+      border: 1px solid rgba(223,232,217,.14);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow);
+      z-index: 90;
+      display:none;
+      overflow:hidden;
+    }
+    .drawerHead{
+      padding: 14px 14px 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(223,232,217,.10);
+    }
+    .drawerBody{
+      padding: 10px 10px 14px;
+      display:grid;
+      gap: 8px;
+    }
+    .drawerBody a{
+      text-decoration:none;
+      padding: 12px 12px;
+      border-radius: 14px;
+      font-weight: 750;
+      border: 1px solid rgba(223,232,217,.10);
+      background: rgba(223,232,217,.04);
+    }
+    .drawerBody a:hover{border-color: rgba(127,226,181,.22); background: rgba(127,226,181,.10)}
+    .drawerFoot{padding: 0 10px 14px}
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(18px);
+      background: rgba(16,29,24,.92);
+      border: 1px solid rgba(223,232,217,.14);
+      border-radius: 999px;
+      padding: 10px 12px;
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      box-shadow: var(--shadow2);
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .25s var(--ease), transform .25s var(--ease);
+      z-index: 120;
+      max-width: calc(100% - 24px);
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast i{color: rgba(127,226,181,.95)}
+    .toast span{color: rgba(234,242,234,.88); font-weight: 700; font-size: 13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  </style>
+</head>
+
+<body>
+  <div class="bg" id="bg">
+    <div class="panel" id="p1"></div>
+    <div class="panel" id="p2"></div>
+    <div class="panel" id="p3"></div>
+    <div class="panel" id="p4"></div>
+  </div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+
+  <!-- Mobile Drawer -->
+  <div class="drawerOverlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Navigation Menu">
+    <div class="drawerHead">
+      <a class="brand" href="#top" aria-label="Home">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <strong>AI Portfolio Studio</strong>
+          <span>Clean • Warm • Corporate-ready</span>
+        </div>
+      </a>
+      <button class="btn iconBtn" id="closeDrawer" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="drawerBody">
+      <a href="#what">What is a Portfolio?</a>
+      <a href="#services">Services</a>
+      <a href="#process">How it works</a>
+      <a href="#showcase">Proof of work</a>
+      <a href="#story">My story</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="drawerFoot">
+      <a class="btn btnPrimary" href="mailto:vmacd1991@gmail.com?subject=Portfolio%20Build%20Inquiry&body=Hi%20Valeria%2C%0A%0AI%27d%20love%20help%20building%20my%20portfolio%20and%20resume.%20Here%27s%20my%20current%20situation%3A%0A%0A-%20Role%2FIndustry%3A%0A-%20Goal%3A%0A-%20Timeline%3A%0A%0AThank%20you!" style="width:100%;justify-content:center">
+        <i class="fa-solid fa-envelope"></i> Let's build your portfolio — reach out!
+      </a>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toastText">Copied to clipboard</span>
+  </div>
+
+  <div id="top"></div>
+
+  <div class="topbar">
+    <div class="container">
+      <div class="nav">
+        <a class="brand" href="#top" aria-label="Home">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <strong>AI Portfolio Studio</strong>
+            <span>Portfolio + Resume + LinkedIn</span>
+          </div>
+        </a>
+
+        <div class="navlinks" id="navlinks">
+          <a href="#what">What is a Portfolio?</a>
+          <a href="#services">Services</a>
+          <a href="#process">How it works</a>
+          <a href="#showcase">Proof of work</a>
+          <a href="#story">My story</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <div class="navRight">
+          <div class="chip" title="AI-powered, human-led">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            AI-powered • human-led
+          </div>
+
+          <button class="btn iconBtn" id="musicBtn" aria-pressed="false" aria-label="Toggle background music">
+            <i class="fa-solid fa-play" id="musicIcon"></i>
+          </button>
+
+          <button class="btn iconBtn menuBtn" id="openDrawer" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+
+          <a class="btn btnPrimary" href="#contact">
+            <i class="fa-solid fa-paper-plane"></i>
+            Start here
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="container">
+      <div class="heroGrid">
+        <div class="heroCard">
+          <div class="heroInner">
+            <div class="eyebrow"><span class="dot"></span> Premium • Technical • Composed</div>
+            <h1>Your talent deserves to be seen.</h1>
+            <p class="lead">
+              I help professionals present themselves with clarity, confidence, and impact using AI-powered tools —
+              without losing the human story behind the achievements.
+            </p>
+
+            <div class="heroActions">
+              <a class="btn btnPrimary" href="mailto:vmacd1991@gmail.com?subject=Let%27s%20build%20my%20portfolio&body=Hi%20Valeria%2C%0A%0AI%27m%20interested%20in%20your%20AI-powered%20portfolio%2Fresume%20service.%0A%0AHere%27s%20my%20current%20role%20and%20goal%3A%0A-%20Role%2Findustry%3A%0A-%20Target%20jobs%3A%0A-%20Timeline%3A%0A%0AThank%20you!">
+                <i class="fa-solid fa-envelope"></i>
+                Let's build your portfolio — reach out!
+              </a>
+              <button class="btn" id="copyEmailBtn" type="button">
+                <i class="fa-regular fa-copy"></i>
+                Copy email
+              </button>
+              <a class="btn" href="#services">
+                <i class="fa-solid fa-layer-group"></i>
+                View services
+              </a>
+            </div>
+
+            <div class="mini">
+              <div class="pill"><i class="fa-solid fa-check"></i> Corporate-ready design</div>
+              <div class="pill"><i class="fa-solid fa-check"></i> Metrics-driven storytelling</div>
+              <div class="pill"><i class="fa-solid fa-check"></i> ATS & LinkedIn optimization</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="side">
+          <div class="statsCard">
+            <div class="statsInner">
+              <div class="statsTop">
+                <div>
+                  <div class="badge"><i class="fa-solid fa-shield-halved"></i> Trust-first approach</div>
+                  <div class="mutedSmall">
+                    Clear structure, polished language, and proof-of-work — designed to feel credible from the first click.
+                  </div>
+                </div>
+                <a class="btn iconBtn" href="#showcase" aria-label="Go to proof of work"><i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+
+              <div class="statGrid" aria-label="Value highlights">
+                <div class="stat">
+                  <b>Clarity</b>
+                  <span>What you do — in one glance</span>
+                </div>
+                <div class="stat">
+                  <b>Confidence</b>
+                  <span>Walk into interviews ready</span>
+                </div>
+                <div class="stat">
+                  <b>Impact</b>
+                  <span>Results, metrics, outcomes</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="audioCard">
+            <div class="audioInner">
+              <div class="audioRow">
+                <div class="audioTitle">
+                  <strong>Background music</strong>
+                  <small>Techno-inspired energy (generated)</small>
+                </div>
+                <button class="btn iconBtn" id="musicBtn2" aria-pressed="false" aria-label="Toggle background music">
+                  <i class="fa-solid fa-play" id="musicIcon2"></i>
+                </button>
+              </div>
+
+              <div class="visualizer" id="viz" aria-hidden="true">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+              </div>
+
+              <div class="mutedSmall" style="margin-top:10px">
+                Tip: If you’re on mobile, tap play — browsers require a user action to start audio.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- What is a portfolio -->
+    <section id="what">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <h2>What is a Professional Portfolio?</h2>
+            <p class="sub">
+              A portfolio is your proof-of-work: a curated, easy-to-navigate story of who you are, what you’ve delivered,
+              and the value you create — beyond a PDF resume.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card" style="grid-column: span 3">
+            <div class="ic"><i class="fa-solid fa-trophy"></i></div>
+            <h3>Stand out in competitive hiring processes</h3>
+            <p>Show outcomes, not just titles. Recruiters remember proof and clarity.</p>
+          </article>
+          <article class="card" style="grid-column: span 3">
+            <div class="ic"><i class="fa-solid fa-user-check"></i></div>
+            <h3>Walk into interviews with confidence</h3>
+            <p>When your narrative is structured, you can speak with calm and precision.</p>
+          </article>
+          <article class="card" style="grid-column: span 3">
+            <div class="ic"><i class="fa-solid fa-briefcase"></i></div>
+            <h3>Project professionalism from the first contact</h3>
+            <p>Instant credibility: consistent visuals, clean copy, and executive tone.</p>
+          </article>
+          <article class="card" style="grid-column: span 3">
+            <div class="ic"><i class="fa-solid fa-fingerprint"></i></div>
+            <h3>Connect your real identity with your professional image</h3>
+            <p>Human story + measurable impact — aligned with the roles you want next.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <h2>Services offered</h2>
+            <p class="sub">Three focused offerings — clear, practical, and built to move your career forward.</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <article class="card serviceCard">
+            <div class="top">
+              <div class="ic"><i class="fa-solid fa-file-lines"></i></div>
+              <span class="tag">Resume</span>
+            </div>
+            <h3>Resume review and improvement</h3>
+            <p>Rewrite for clarity, ATS readability, and a confident executive tone — with metrics and outcomes.</p>
+            <ul>
+              <li>Impact-first bullet rewrites</li>
+              <li>ATS structure + keyword strategy</li>
+              <li>Role-targeted positioning</li>
+            </ul>
+            <div class="actions">
+              <button class="btn" type="button" data-open-modal="resume"><i class="fa-solid fa-magnifying-glass"></i> See what you get</button>
+              <a class="btn btnPrimary" href="#contact"><i class="fa-solid fa-paper-plane"></i> Enquire</a>
+            </div>
+          </article>
+
+          <article class="card serviceCard">
+            <div class="top">
+              <div class="ic"><i class="fa-solid fa-globe"></i></div>
+              <span class="tag">Portfolio</span>
+            </div>
+            <h3>Full professional portfolio built from scratch</h3>
+            <p>A modern single-page portfolio that shows your value fast — designed for LinkedIn and recruiters.</p>
+            <ul>
+              <li>Personal brand + positioning</li>
+              <li>Projects, dashboards, case studies</li>
+              <li>Polished visuals + responsive layout</li>
+            </ul>
+            <div class="actions">
+              <button class="btn" type="button" data-open-modal="portfolio"><i class="fa-solid fa-wand-magic-sparkles"></i> See deliverables</button>
+              <a class="btn btnPrimary" href="#showcase"><i class="fa-solid fa-arrow-up-right-from-square"></i> Proof of work</a>
+            </div>
+          </article>
+
+          <article class="card serviceCard">
+            <div class="top">
+              <div class="ic"><i class="fa-brands fa-linkedin"></i></div>
+              <span class="tag">LinkedIn</span>
+            </div>
+            <h3>LinkedIn profile optimization</h3>
+            <p>Turn your profile into a landing page: clearer headline, stronger narrative, and a credible presence.</p>
+            <ul>
+              <li>Headline + About rewrite</li>
+              <li>Experience reframed for impact</li>
+              <li>Featured section strategy</li>
+            </ul>
+            <div class="actions">
+              <button class="btn" type="button" data-open-modal="linkedin"><i class="fa-solid fa-pen-nib"></i> View approach</button>
+              <a class="btn btnPrimary" href="#contact"><i class="fa-solid fa-envelope"></i> Message me</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="process">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <h2>How it works</h2>
+            <p class="sub">Simple, structured, and fast — while staying personal and true to who you are.</p>
+          </div>
+        </div>
+
+        <div class="grid steps">
+          <article class="card step">
+            <div class="stepNum"><span class="num">1</span> We talk</div>
+            <h3>We review your current situation</h3>
+            <p>Role goals, strengths, gaps, and what you want next — with a clear plan from day one.</p>
+          </article>
+          <article class="card step">
+            <div class="stepNum"><span class="num">2</span> I ask the right questions</div>
+            <h3>Achievements, tools, metrics, goals</h3>
+            <p>We extract the real impact: outcomes, scale, constraints, decisions, and proof.</p>
+          </article>
+          <article class="card step">
+            <div class="stepNum"><span class="num">3</span> We build</div>
+            <h3>Something that truly represents you</h3>
+            <p>Professional tone, modern design, and a narrative that makes hiring teams say: “This is the one.”</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Showcase -->
+    <section id="showcase">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <h2>Personal portfolio showcase (proof of work)</h2>
+            <p class="sub">
+              I build what I sell. Here’s a real example of automation and data dashboards — so you can see the standard.
+            </p>
+          </div>
+        </div>
+
+        <div class="showcase">
+          <div class="showcaseCard">
+            <div class="showcaseInner">
+              <h3 style="margin:0 0 8px; font-size:18px; letter-spacing:-0.01em">Automation & data dashboards portfolio</h3>
+              <p class="sub" style="margin:0; max-width: 85ch">
+                Clean structure, measurable outcomes, and a confident narrative — designed to be shared on LinkedIn and opened by recruiters.
+              </p>
+
+              <div class="proof">
+                <div class="kpi">
+                  <b>Executive-friendly clarity</b>
+                  <span>Fast scanning: what, how, impact — without fluff.</span>
+                </div>
+                <div class="kpi">
+                  <b>Technical credibility</b>
+                  <span>Dashboards and automation showcased as proof, not claims.</span>
+                </div>
+                <div class="kpi">
+                  <b>Premium presentation</b>
+                  <span>Modern visuals, consistent tone, and clean hierarchy.</span>
+                </div>
+              </div>
+
+              <div style="margin-top: 14px; display:flex; gap:10px; flex-wrap:wrap">
+                <a class="btn btnPrimary" href="https://valeriamasalfonzo-collab.github.io/valeriamas.github.io/" target="_blank" rel="noopener">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  Click here to view my automation and data dashboards portfolio
+                </a>
+                <button class="btn" type="button" id="copyShowcaseLink">
+                  <i class="fa-regular fa-copy"></i> Copy link
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="showcaseAction">
+            <div class="ctaPanel">
+              <div class="inner">
+                <h3>Want yours to look this strong?</h3>
+                <p>Send a message with your target role. I’ll guide you into a portfolio that feels like you — and reads like a top candidate.</p>
+                <div class="actions">
+                  <a class="btn btnPrimary" href="#contact"><i class="fa-solid fa-envelope"></i> Contact</a>
+                  <a class="btn" href="#services"><i class="fa-solid fa-layer-group"></i> Services</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="ctaPanel" style="border-color: rgba(217,179,125,.22); background: linear-gradient(180deg, rgba(16,29,24,.62), rgba(16,29,24,.45))">
+              <div class="inner">
+                <h3>Quick self-check</h3>
+                <p>In 10 seconds, does your profile clearly answer: <span class="hi">what you do</span>, <span class="hi">what you’ve delivered</span>, and <span class="hi">why you</span>?</p>
+                <div class="actions">
+                  <button class="btn" type="button" id="openAudit"><i class="fa-solid fa-list-check"></i> Run a mini-audit</button>
+                  <button class="btn" type="button" id="scrollToStory"><i class="fa-solid fa-book"></i> Read my story</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Story -->
+    <section id="story">
+      <div class="container">
+        <div class="sectionHead">
+          <div>
+            <h2>The story behind the service</h2>
+            <p class="sub">The real reason I care about helping people show the world what they’re worth.</p>
+          </div>
+        </div>
+
+        <div class="storyWrap">
+          <div class="storyInner">
+            <div class="quote">
+              <strong>“My mind runs like a Formula One car. Sometimes like a Ferrari.”</strong>
+              <p>
+                I have dyslexia and ADHD. I process information at full speed, connect dots others don’t see,
+                and jump between ideas faster than most people can keep up.
+              </p>
+            </div>
+
+            <div class="story">
+              <p>I'll be honest with you — my brain doesn't work like everyone else's.</p>
+              <p>
+                For a long time, the world tried to tell me that was a problem.
+                <span class="hi">It wasn't. It was my superpower.</span>
+              </p>
+              <p>
+                I was born and raised in Venezuela, where I trained as a paramedic — learning to stay calm in chaos,
+                make fast decisions under pressure, and lead when everything around me was uncertain.
+              </p>
+              <p>
+                When my country changed and staying was no longer an option, I packed up everything, took my wife's hand,
+                and moved to the UK. No safety net. No guarantee. Just resilience — and an unshakeable belief that I was built for more.
+              </p>
+              <p>
+                And then I rebuilt myself. Completely. From housekeeping to store operations. From data entry to running full purchase order cycles
+                and my own e-commerce business across three platforms.
+              </p>
+              <p>
+                From zero to certifications in AI, Business Intelligence, Data, and Supply Chain — from Google, Anthropic, Cisco, and Coursera.
+                All of it while working full-time. All of it self-driven.
+              </p>
+              <p>
+                My friends call me a genius. I just call it focus — <span class="hi">Ferrari style.</span>
+              </p>
+              <p>
+                Today I use everything I've learned — operations, AI, data, storytelling, and an obsession with innovation —
+                to do one thing: help people like you show the world exactly what you're worth.
+              </p>
+              <p>
+                Because I know what it feels like to have everything inside you and not know how to get it out.
+                I've been there. And I found the way. Now I'm here to help you find yours.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="contact">
+      <div class="container">
+        <div class="contactCard">
+          <div class="contactInner">
+            <div>
+              <h2>Ready when you are.</h2>
+              <p>
+                Every journey starts with one message. You've got this.
+                If you tell me where you are now and where you want to go, we’ll build a portfolio that truly represents you.
+              </p>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <a class="btn btnPrimary" href="mailto:vmacd1991@gmail.com?subject=Let%27s%20build%20your%20portfolio&body=Hi%20Valeria%2C%0A%0AI%27m%20ready%20to%20build%20a%20portfolio%20and%2For%20improve%20my%20resume%20with%20your%20AI-powered%20process.%0A%0AHere%27s%20what%20I%27m%20aiming%20for%3A%0A-%20Target%20role%3A%0A-%20Industry%3A%0A-%20Top%203%20achievements%3A%0A-%20Timeline%3A%0A%0AThank%20you!">
+                <i class="fa-solid fa-envelope"></i>
+                Let's build your portfolio — reach out!
+              </a>
+              <button class="btn" type="button" id="copyEmailBtn2">
+                <i class="fa-regular fa-copy"></i>
+                Copy email
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px; color: rgba(234,242,234,.68); font-size: 12.5px; line-height: 1.5">
+          <span style="opacity:.9">Note:</span> Background audio is generated in-browser (techno-inspired) to match the premium, technical vibe.
+          You can toggle it anytime.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modals -->
+  <div id="modalOverlay" class="drawerOverlay" style="z-index: 200;"></div>
+  <div id="modal" class="drawer" style="z-index: 210; display:none; max-width: 860px; margin: 0 auto; left: 50%; right: auto; transform: translateX(-50%); top: 72px;" role="dialog" aria-modal="true" aria-label="Service details">
+    <div class="drawerHead">
+      <div style="display:flex; align-items:center; gap:10px">
+        <div class="logo" aria-hidden="true" style="width:34px; height:34px; border-radius: 12px"></div>
+        <div>
+          <strong id="modalTitle" style="display:block; font-size: 14px;">Details</strong>
+          <span id="modalSubtitle" style="display:block; font-size: 12px; color: rgba(234,242,234,.72); font-weight:650; margin-top:2px">What you get</span>
+        </div>
+      </div>
+      <button class="btn iconBtn" id="closeModal" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="drawerBody" id="modalBody" style="gap:10px; padding: 12px 14px 16px;">
+      <!-- injected -->
+    </div>
+    <div class="drawerFoot" style="padding: 0 14px 14px; display:flex; gap:10px; flex-wrap:wrap">
+      <a class="btn btnPrimary" href="mailto:vmacd1991@gmail.com?subject=Service%20Inquiry&body=Hi%20Valeria%2C%0A%0AI%27d%20like%20to%20get%20started.%20My%20target%20role%20is%3A%20%0A%0AThank%20you!" id="modalCta">
+        <i class="fa-solid fa-envelope"></i> Reach out
+      </a>
+      <button class="btn" type="button" id="modalCopy">
+        <i class="fa-regular fa-copy"></i> Copy checklist
+      </button>
+    </div>
+  </div>
+
+  <!-- Mini audit modal -->
+  <div id="auditModal" class="drawer" style="z-index: 210; display:none; max-width: 860px; margin: 0 auto; left: 50%; right:auto; transform: translateX(-50%); top: 72px;" role="dialog" aria-modal="true" aria-label="Mini audit">
+    <div class="drawerHead">
+      <div style="display:flex; align-items:center; gap:10px">
+        <div class="logo" aria-hidden="true" style="width:34px; height:34px; border-radius: 12px"></div>
+        <div>
+          <strong style="display:block; font-size: 14px;">10-second mini-audit</strong>
+          <span style="display:block; font-size: 12px; color: rgba(234,242,234,.72); font-weight:650; margin-top:2px">Check the basics that get you shortlisted</span>
+        </div>
+      </div>
+      <button class="btn iconBtn" id="closeAuditModal" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="drawerBody" style="gap:10px; padding: 12px 14px 16px;">
+      <div class="card" style="grid-column: span 12; margin:0; padding: 16px; background: rgba(223,232,217,.04)">
+        <h3 style="margin:0 0 6px">Answer “yes” to at least 6</h3>
+        <p style="margin:0; color: rgba(234,242,234,.75)">If not, your portfolio/resume likely needs restructuring — not just rewriting.</p>
+      </div>
+
+      <div class="grid" style="gap:10px">
+        <label class="card" style="grid-column: span 6; display:flex; gap:12px; align-items:flex-start; cursor:pointer">
+          <input type="checkbox" class="audit" />
+          <div>
+            <h3 style="margin:0 0 4px; font-size: 14.5px">I’m clear on my target role</h3>
+            <p style="margin:0">Title, level, and industry are specific — not “anything”.</p>
+          </div>
+        </label>
+        <label class="card" style="grid-column: span 6; display:flex; gap:12px; align-items:flex-start; cursor:pointer">
+          <input type="checkbox" class="audit" />
+          <div>
+            <h3 style="margin:0 0 4px; font-size: 14.5px">My headline communicates value</h3>
+            <p style="margin:0">Not a job title list — a promise of impact.</p>
+          </div>
+        </label>
+        <label class="card" style="grid-column: span 6; display:flex; gap:12px; align-items:flex-start; cursor:pointer">
+          <input type="checkbox" class="audit" />
+          <div>
+            <h3 style="margin:0 0 4px; font-size: 14.5px">I show metrics</h3>
+            <p style="margin:0">Time saved, revenue impact, volume, accuracy, SLA, cost.</p>
+          </div>
+        </label>
+        <label class="card" style="grid-column: span 6; display:flex; gap:12px; align-items:flex-start; cursor:pointer">
+          <input type="checkbox" class="audit" />
+          <div>
+            <h3 style="margin:0 0 4px; font-size: 14.5px">My projects are scannable</h3>
+            <p style="margin:0">Problem → approach → tools → result (in 20 seconds).</p>
+          </div>
+        </label>
+        <label class="card" style="grid-column: span 6; display:flex; gap:12px; align-items:flex-start; cursor:pointer">
+          <input type="checkbox" class="audit" />
+          <div>
+            <h3 style="margin:0 0 4px; font-size: 14.5px">My story feels human</h3>
+            <p style="margin:0">Clear voice, confident tone, authentic narrative.</p>
+          </div>
+        </label>
+        <label class="card" style="grid-column: span 6; display:flex; gap:12px; align-items:flex-start; cursor:pointer">
+          <input type="checkbox" class="audit" />
+          <div>
+            <h3 style="margin:0 0 4px; font-size: 14.5px">My design looks modern</h3>
+            <p style="margin:0">Consistent spacing, readable type, mobile-friendly layout.</p>
+          </div>
+        </label>
+      </div>
+
+      <div class="card" style="grid-column: span 12; margin:0; padding: 16px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap">
+          <div>
+            <h3 style="margin:0 0 6px">Your score: <span id="auditScore">0</span>/6</h3>
+            <p style="margin:0; color: rgba(234,242,234,.75)" id="auditMessage">Check items to calculate.</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <button class="btn" type="button" id="auditReset"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+            <a class="btn btnPrimary" href="#contact" id="auditCta"><i class="fa-solid fa-envelope"></i> Fix this with me</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Smooth scroll + active nav
+    const navAnchors = [...document.querySelectorAll('.navlinks a, .drawerBody a')];
+    navAnchors.forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        const href = a.getAttribute('href');
+        if(href && href.startsWith('#')){
+          e.preventDefault();
+          document.querySelector(href)?.scrollIntoView({behavior:'smooth', block:'start'});
+          closeDrawer();
+        }
+      });
+    });
+
+    const sections = ['what','services','process','showcase','story','contact'].map(id=>document.getElementById(id));
+    const desktopLinks = [...document.querySelectorAll('.navlinks a')];
+    const obs = new IntersectionObserver((entries)=>{
+      const visible = entries.filter(en=>en.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(!visible) return;
+      const id = visible.target.id;
+      desktopLinks.forEach(l=>{
+        const match = l.getAttribute('href') === `#${id}`;
+        l.classList.toggle('active', match);
+      });
+    }, {rootMargin: "-35% 0px -55% 0px", threshold: [0.08, 0.14, 0.22]});
+    sections.forEach(s=>s && obs.observe(s));
+
+    // Drawer
+    const drawer = document.getElementById('drawer');
+    const overlay = document.getElementById('drawerOverlay');
+    const openDrawerBtn = document.getElementById('openDrawer');
+    const closeDrawerBtn = document.getElementById('closeDrawer');
+    function openDrawer(){
+      overlay.style.display = 'block';
+      drawer.style.display = 'block';
+      requestAnimationFrame(()=>{
+        overlay.style.opacity = '1';
+      });
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer(){
+      overlay.style.display = 'none';
+      drawer.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    openDrawerBtn?.addEventListener('click', openDrawer);
+    closeDrawerBtn?.addEventListener('click', closeDrawer);
+    overlay?.addEventListener('click', closeDrawer);
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape'){
+        closeDrawer();
+        closeAnyModal();
+      }
+    });
+
+    // Toast
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toastText');
+    let toastTimer = null;
+    function showToast(msg){
+      toastText.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>toast.classList.remove('show'), 1900);
+    }
+
+    // Copy actions
+    const email = 'vmacd1991@gmail.com';
+    async function copyText(txt, msg){
+      try{
+        await navigator.clipboard.writeText(txt);
+        showToast(msg || 'Copied');
+      }catch(err){
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = txt;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast(msg || 'Copied');
+      }
+    }
+    document.getElementById('copyEmailBtn')?.addEventListener('click', ()=>copyText(email, 'Email copied'));
+    document.getElementById('copyEmailBtn2')?.addEventListener('click', ()=>copyText(email, 'Email copied'));
+    document.getElementById('copyShowcaseLink')?.addEventListener('click', ()=>copyText('https://valeriamasalfonzo-collab.github.io/valeriamas.github.io/', 'Link copied'));
+
+    // 3D moving panels background (mouse + subtle auto drift)
+    const bg = document.getElementById('bg');
+    const p1 = document.getElementById('p1');
+    const p2 = document.getElementById('p2');
+    const p3 = document.getElementById('p3');
+    const p4 = document.getElementById('p4');
+
+    const panels = [
+      {el:p1, x: 10, y: 12, z: 30, s: 1.05, r: -12},
+      {el:p2, x: 66, y: 16, z: 18, s: 0.95, r: 10},
+      {el:p3, x: 18, y: 62, z: 12, s: 0.92, r: 7},
+      {el:p4, x: 70, y: 66, z: 26, s: 1.02, r: -8},
+    ];
+
+    function positionPanels(){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      panels.forEach((p,i)=>{
+        const size = Math.min(w,h) * 0.58;
+        p.el.style.width = `${Math.max(280, size)}px`;
+        p.el.style.height = `${Math.max(280, size)}px`;
+        p.el.style.left = `calc(${p.x}% - ${Math.max(280,size)/2}px)`;
+        p.el.style.top  = `calc(${p.y}% - ${Math.max(280,size)/2}px)`;
+      });
+    }
+    positionPanels();
+    window.addEventListener('resize', positionPanels);
+
+    let mx = 0, my = 0, tx = 0, ty = 0;
+    window.addEventListener('mousemove', (e)=>{
+      mx = (e.clientX / window.innerWidth) * 2 - 1;
+      my = (e.clientY / window.innerHeight) * 2 - 1;
+    }, {passive:true});
+
+    window.addEventListener('touchmove', (e)=>{
+      if(!e.touches || !e.touches[0]) return;
+      const t = e.touches[0];
+      mx = (t.clientX / window.innerWidth) * 2 - 1;
+      my = (t.clientY / window.innerHeight) * 2 - 1;
+    }, {passive:true});
+
+    let t0 = performance.now();
+    function animateBg(now){
+      const dt = Math.min(0.04, (now - t0)/1000);
+      t0 = now;
+
+      // smooth
+      tx += (mx - tx) * (1 - Math.pow(0.0008, dt*60));
+      ty += (my - ty) * (1 - Math.pow(0.0008, dt*60));
+
+      const drift = now * 0.00015;
+      const rotX = (ty*6) + Math.sin(drift)*1.2;
+      const rotY = (-tx*8) + Math.cos(drift*0.9)*1.2;
+
+      bg.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+
+      panels.forEach((p,i)=>{
+        const bob = Math.sin(drift*4 + i) * 8;
+        const sway = Math.cos(drift*3 + i*1.7) * 10;
+        const rz = p.r + (-tx*10) + (i%2?1:-1)*Math.sin(drift*3)*2;
+        p.el.style.transform =
+          `translate3d(${sway}px, ${bob}px, ${p.z}px) rotateZ(${rz}deg) rotateX(${ty*8}deg) rotateY(${tx*10}deg) scale(${p.s})`;
+      });
+
+      requestAnimationFrame(animateBg);
+    }
+    requestAnimationFrame(animateBg);
+
+    // Music (techno-inspired) using WebAudio (no external files)
+    let audioCtx = null;
+    let master = null, compressor = null, filter = null;
+    let isPlaying = false;
+    let startTime = 0;
+    let timers = [];
+    let analyser = null;
+    let vizRAF = null;
+
+    const bars = [...document.querySelectorAll('.bar')];
+
+    function setMusicButtons(playing){
+      const iconClass = playing ? 'fa-pause' : 'fa-play';
+      document.getElementById('musicIcon').className = `fa-solid ${iconClass}`;
+      document.getElementById('musicIcon2').className = `fa-solid ${iconClass}`;
+      document.getElementById('musicBtn').setAttribute('aria-pressed', String(playing));
+      document.getElementById('musicBtn2').setAttribute('aria-pressed', String(playing));
+    }
+
+    function schedule(fn, ms){
+      const id = setTimeout(fn, ms);
+      timers.push(id);
+      return id;
+    }
+    function clearTimers(){
+      timers.forEach(clearTimeout);
+      timers = [];
+    }
+
+    function createKick(time){
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(140, time);
+      osc.frequency.exponentialRampToValueAtTime(48, time + 0.08);
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.exponentialRampToValueAtTime(0.9, time + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.22);
+
+      osc.connect(gain);
+      gain.connect(filter);
+      osc.start(time);
+      osc.stop(time + 0.25);
+    }
+
+    function createHat(time, open=false){
+      const bufSize = 2 * audioCtx.sampleRate;
+      const noiseBuffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i=0; i<bufSize; i++) output[i] = (Math.random()*2 - 1) * 0.6;
+
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuffer;
+
+      const hp = audioCtx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 6000;
+
+      const bp = audioCtx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 9000;
+      bp.Q.value = 0.7;
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.exponentialRampToValueAtTime(open ? 0.22 : 0.14, time + 0.003);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + (open ? 0.22 : 0.07));
+
+      noise.connect(hp);
+      hp.connect(bp);
+      bp.connect(gain);
+      gain.connect(filter);
+
+      noise.start(time);
+      noise.stop(time + (open ? 0.23 : 0.08));
+    }
+
+    function createBass(time, noteHz, dur=0.22){
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(noteHz, time);
+
+      gain.gain.setValueAtTime(0.0001, time);
+      gain.gain.exponentialRampToValueAtTime(0.18, time + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+
+      osc.connect(gain);
+      gain.connect(filter);
+      osc.start(time);
+      osc.stop(time + dur + 0.02);
+    }
+
+    function createClap(time){
+      // layered noise burst
+      const bufSize = audioCtx.sampleRate;
+      const noiseBuffer = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+      const data = noiseBuffer.getChannelData(0);
+      for(let i=0;i<bufSize;i++) data[i] = (Math.random()*2-1);
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = noiseBuffer;
+
+      const bp = audioCtx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 1800;
+      bp.Q.value = 0.6;
+
+      const gain = audioCtx.createGain();
+      const t = time;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(0.35, t+0.004);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t+0.09);
+
+      src.connect(bp);
+      bp.connect(gain);
+      gain.connect(filter);
+
+      src.start(t);
+      src.stop(t+0.1);
+    }
+
+    function setupAudio(){
+      if(audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.value = -18;
+      compressor.knee.value = 22;
+      compressor.ratio.value = 4;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.12;
+
+      filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 14000;
+      filter.Q.value = 0.5;
+
+      master = audioCtx.createGain();
+      master.gain.value = 0.55;
+
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 128;
+
+      filter.connect(compressor);
+      compressor.connect(master);
+      master.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    }
+
+    function startMusic(){
+      setupAudio();
+      if(audioCtx.state === 'suspended') audioCtx.resume();
+
+      isPlaying = true;
+      setMusicButtons(true);
+      showToast('Music on');
+
+      const bpm = 128;
+      const spb = 60 / bpm;
+      const step = spb / 2; // 8th notes
+      startTime = audioCtx.currentTime + 0.06;
+
+      clearTimers();
+
+      // Pattern (techno-inspired): kick 4/4, hats on off-beats, clap on 2 & 4, bass syncopation
+      let stepIndex = 0;
+      const bassSeq = [55, 55, 65.41, 55, 73.42, 65.41, 55, 49]; // A1, A1, C2, A1, D2, C2, A1, G1
+      const totalSteps = 64;
+
+      function tick(){
+        if(!isPlaying) return;
+        const t = startTime + stepIndex * step;
+
+        // kick: every 2 steps (quarter notes)
+        if(stepIndex % 2 === 0) createKick(t);
+
+        // hats: off-beat closed hats
+        if(stepIndex % 2 === 1) createHat(t, false);
+
+        // open hat: occasional lift
+        if(stepIndex % 16 === 15) createHat(t, true);
+
+        // clap: on beats 2 and 4 (quarter notes at steps 4 and 12 in 16-step bar)
+        const inBar = stepIndex % 16;
+        if(inBar === 4 || inBar === 12) createClap(t);
+
+        // bass: every step with groove (skip some)
+        const groove = [1,0,1,1, 0,1,0,1, 1,0,1,0, 0,1,1,0];
+        if(groove[inBar]){
+          const note = bassSeq[Math.floor(stepIndex/2) % bassSeq.length];
+          createBass(t, note, 0.18);
+        }
+
+        // gentle filter motion for “movement”
+        const sweep = 9000 + Math.sin((audioCtx.currentTime - startTime) * 1.4) * 4500;
+        filter.frequency.setTargetAtTime(sweep, t, 0.03);
+
+        stepIndex = (stepIndex + 1) % totalSteps;
+        schedule(tick, step * 1000 * 0.98);
+      }
+      tick();
+      startViz();
+    }
+
+    function stopMusic(){
+      isPlaying = false;
+      setMusicButtons(false);
+      showToast('Music off');
+      clearTimers();
+      stopViz();
+      // fade down smoothly if context exists
+      if(master && audioCtx){
+        const t = audioCtx.currentTime;
+        master.gain.cancelScheduledValues(t);
+        master.gain.setTargetAtTime(0.0001, t, 0.05);
+        setTimeout(()=>{
+          if(master) master.gain.value = 0.55;
+        }, 300);
+      }
+    }
+
+    function toggleMusic(){
+      if(!isPlaying) startMusic();
+      else stopMusic();
+    }
+
+    document.getElementById('musicBtn')?.addEventListener('click', toggleMusic);
+    document.getElementById('musicBtn2')?.addEventListener('click', toggleMusic);
+
+    // Visualizer
+    const data = new Uint8Array(64);
+    function startViz(){
+      if(!analyser) return;
+      cancelAnimationFrame(vizRAF);
+      function draw(){
+        if(!isPlaying){ return; }
+        analyser.getByteFrequencyData(data);
+        for(let i=0;i<bars.length;i++){
+          const v = data[i*2] / 255; // 0..1
+          const h = 8 + Math.pow(v, 1.6) * 28;
+          bars[i].style.height = `${h}px`;
+          bars[i].style.opacity = `${0.6 + v*0.4}`;
+        }
+        vizRAF = requestAnimationFrame(draw);
+      }
+      vizRAF = requestAnimationFrame(draw);
+    }
+    function stopViz(){
+      cancelAnimationFrame(vizRAF);
+      // settle bars
+      bars.forEach((b,i)=> b.style.height = `${10 + (i%5)*2}px`);
+    }
+    stopViz();
+
+    // Service Modals
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalSubtitle = document.getElementById('modalSubtitle');
+    const modalBody = document.getElementById('modalBody');
+    const modalCta = document.getElementById('modalCta');
+    const modalCopy = document.getElementById('modalCopy');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    const serviceData = {
+      resume: {
+        title: "Resume review and improvement",
+        subtitle: "ATS-ready, impact-first rewrite",
+        items: [
+          "Reframe experience into impact (Problem → Action → Result).",
+          "Strengthen keyword alignment to target roles without stuffing.",
+          "Fix structure for readability: spacing, sections, hierarchy.",
+          "Add measurable outcomes (time saved, cost, volume, SLA, accuracy).",
+          "Deliver a clean version + a tracked improvement checklist."
+        ],
+        subject: "Resume review & improvement",
+      },
+      portfolio: {
+        title: "Full professional portfolio built from scratch",
+        subtitle: "Modern, LinkedIn-ready proof-of-work",
+        items: [
+          "Personal brand positioning (clear role target + value proposition).",
+          "Project/case study layout: tools, context, decisions, outcomes.",
+          "Polished visual hierarchy and premium tone for corporate audiences.",
+          "Mobile-first responsive build and easy-to-share link format.",
+          "Optional sections: dashboards, automation, certificates, testimonials."
+        ],
+        subject: "Full professional portfolio build",
+      },
+      linkedin: {
+        title: "LinkedIn profile optimization",
+        subtitle: "Make your profile read like a landing page",
+        items: [
+          "Headline rewrite that communicates value (not only titles).",
+          "About section: confident voice, clarity, and proof.",
+          "Experience: bullet restructuring into results and metrics.",
+          "Featured section strategy: what to pin to get recruiters to click.",
+          "Consistency check: keywords, skills, and tone alignment."
+        ],
+        subject: "LinkedIn profile optimization",
+      }
+    };
+
+    function openModal(key){
+      const d = serviceData[key];
+      if(!d) return;
+
+      modalTitle.textContent = d.title;
+      modalSubtitle.textContent = d.subtitle;
+
+      modalBody.innerHTML = `
+        <div class="card" style="grid-column: span 12; margin:0; padding: 16px;">
+          <h3 style="margin:0 0 8px; font-size: 15.5px;">What you get</h3>
+          <ul style="margin:0; padding-left: 18px; color: rgba(234,242,234,.80); line-height: 1.65; font-size: 13.8px;">
+            ${d.items.map(x=>`<li style="margin: 6px 0">${x}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="card" style="grid-column: span 12; margin:0; padding: 16px; background: rgba(223,232,217,.04)">
+          <h3 style="margin:0 0 6px; font-size: 15px;">Fast start prompt (optional)</h3>
+          <p style="margin:0; color: rgba(234,242,234,.76); line-height: 1.55; font-size: 13.6px;">
+            Send 3 achievements you’re proud of + the job title you want next. I’ll extract the metrics and build the narrative from there.
+          </p>
+        </div>
+      `;
+
+      modalCta.href = `mailto:${email}?subject=${encodeURIComponent(d.subject)}&body=${encodeURIComponent(
+        `Hi Valeria,\n\nI'm interested in: ${d.title}.\n\nMy target role:\nMy industry:\nMy timeline:\n\nTop 3 achievements (rough bullets are fine):\n1)\n2)\n3)\n\nThank you!`
+      )}`;
+
+      modalOverlay.style.display = 'block';
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(){
+      modalOverlay.style.display = 'none';
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function closeAnyModal(){
+      closeModal();
+      closeAudit();
+    }
+
+    closeModalBtn?.addEventListener('click', closeModal);
+    modalOverlay?.addEventListener('click', closeAnyModal);
+
+    document.querySelectorAll('[data-open-modal]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        openModal(btn.getAttribute('data-open-modal'));
+      });
+    });
+
+    modalCopy?.addEventListener('click', async ()=>{
+      const title = modalTitle.textContent;
+      const list = [...modalBody.querySelectorAll('li')].map(li=>`- ${li.textContent.trim()}`).join('\n');
+      await copyText(`${title}\n\nChecklist:\n${list}`, 'Checklist copied');
+    });
+
+    // Mini audit modal
+    const auditModal = document.getElementById('auditModal');
+    const closeAuditModal = document.getElementById('closeAuditModal');
+    const openAuditBtn = document.getElementById('openAudit');
+    const auditOverlay = modalOverlay; // reuse overlay
+    const auditScore = document.getElementById('auditScore');
+    const auditMessage = document.getElementById('auditMessage');
+    const auditReset = document.getElementById('auditReset');
+    const auditChecks = () => [...document.querySelectorAll('.audit')];
+
+    function openAudit(){
+      auditOverlay.style.display = 'block';
+      auditModal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      updateAudit();
+    }
+    function closeAudit(){
+      auditModal.style.display = 'none';
+      // only hide overlay if no other modal visible
+      if(modal.style.display === 'none'){
+        auditOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+
+    function updateAudit(){
+      const checks = auditChecks();
+      const count = checks.filter(c=>c.checked).length;
+      auditScore.textContent = String(count);
+      if(count === 0) auditMessage.textContent = "Check items to calculate.";
+      else if(count <= 2) auditMessage.textContent = "Start with clarity: target role + headline + one measurable win.";
+      else if(count <= 4) auditMessage.textContent = "Good foundation. Add proof (projects/metrics) and tighten the narrative.";
+      else auditMessage.textContent = "Strong. Next step: refine tone + visuals and make your proof-of-work irresistible.";
+    }
+
+    openAuditBtn?.addEventListener('click', openAudit);
+    closeAuditModal?.addEventListener('click', closeAudit);
+    auditOverlay?.addEventListener('click', ()=>{
+      // close whichever is open
+      closeAnyModal();
+    });
+
+    auditChecks().forEach(c=>c.addEventListener('change', updateAudit));
+    auditReset?.addEventListener('click', ()=>{
+      auditChecks().forEach(c=>c.checked=false);
+      updateAudit();
+      showToast('Reset');
+    });
+
+    // Story scroll
+    document.getElementById('scrollToStory')?.addEventListener('click', ()=>{
+      document.getElementById('story')?.scrollIntoView({behavior:'smooth', block:'start'});
+    });
+
+    // Respect user interaction constraints for audio: keep paused until user presses play.
+    setMusicButtons(false);
+  </script>
+</body>
+</html>
